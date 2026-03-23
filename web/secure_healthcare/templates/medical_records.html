@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Medical Records · Secure Healthcare{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div class="page-heading-title">
+    <div class="page-heading-icon">
+      <i class="fa-solid fa-file-medical"></i>
+    </div>
+    <div>
+      <h1>Medical Records</h1>
+      <div class="text-muted small">
+        High-level overview of encrypted records across the hospital.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 g-lg-4">
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Record distribution (demo)</h2>
+        <p class="text-muted small">
+          This page is a dashboard-style overview and uses the same secure
+          patient dataset under the hood.
+        </p>
+
+        <div class="row g-3">
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 p-3 text-center bg-light">
+              <div class="small text-muted text-uppercase">Total records</div>
+              <div class="h4 mb-0">{{ stats.total_patients or 0 }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 p-3 text-center">
+              <div class="small text-muted text-uppercase">Critical</div>
+              <div class="h4 mb-0">{{ stats.critical_cases or 0 }}</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-4">
+            <div class="border rounded-3 p-3 text-center bg-light">
+              <div class="small text-muted text-uppercase">Last 24h</div>
+              <div class="h4 mb-0">{{ stats.recent_records or 0 }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Data protection summary</h2>
+        <ul class="small text-muted mb-0 ps-3">
+          <li>All PHI fields stored as encrypted blobs.</li>
+          <li>Application-level role checks enforced on every request.</li>
+          <li>Audit-friendly logs for access and changes.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

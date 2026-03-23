@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Security Logs · Secure Healthcare{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div class="page-heading-title">
+    <div class="page-heading-icon">
+      <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <div>
+      <h1>Security Logs</h1>
+      <div class="text-muted small">
+        Visibility into access events and security-relevant actions.
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3 g-lg-4">
+  <div class="col-12 col-lg-5">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h2 class="h6 mb-3">Security overview</h2>
+        <div class="row g-3">
+          <div class="col-4">
+            <div class="border rounded-3 p-2 text-center">
+              <div class="small text-muted text-uppercase">Failed logins</div>
+              <div class="h5 mb-0">{{ stats.failed_logins or 0 }}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="border rounded-3 p-2 text-center">
+              <div class="small text-muted text-uppercase">Suspicious</div>
+              <div class="h5 mb-0">{{ stats.suspicious_events or 0 }}</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="border rounded-3 p-2 text-center">
+              <div class="small text-muted text-uppercase">Unauthorized</div>
+              <div class="h5 mb-0">{{ stats.unauthorized_attempts or 0 }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h2 class="h6 mb-2">Suspicious IP addresses</h2>
+        <p class="text-muted small mb-2">
+          IPs with repeated failed logins or suspicious activity.
+        </p>
+        {% if suspicious_ips %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">IP address</th>
+                <th scope="col" class="text-end">Events</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in suspicious_ips %}
+              <tr>
+                <td class="small">{{ row.ip_address }}</td>
+                <td class="text-end small">
+                  <span class="badge bg-danger-subtle text-danger">
+                    {{ row.failures }} events
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-muted small">
+          No suspicious IPs detected yet.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-7">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="h6 mb-0">Recent events</h2>
+            <div class="text-muted small">Most recent security-relevant activity.</div>
+          </div>
+          <span class="badge bg-primary-subtle text-primary">
+            {{ logs|length }} events
+          </span>
+        </div>
+
+        {% if logs %}
+        <div class="table-responsive">
+          <table class="table table-sm align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">Timestamp</th>
+                <th scope="col">User</th>
+                <th scope="col">IP</th>
+                <th scope="col">Type</th>
+                <th scope="col">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in logs %}
+              <tr>
+                <td class="small text-muted">{{ log.timestamp }}</td>
+                <td class="small">
+                  {{ log.username or "N/A" }}
+                  {% if log.role %}
+                  <span class="badge bg-light text-muted border ms-1">
+                    {{ log.role|capitalize }}
+                  </span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted">{{ log.ip_address or "N/A" }}</td>
+                <td class="small">
+                  {% set et = log.event_type %}
+                  {% if et == "login_success" %}
+                  <span class="badge bg-success-subtle text-success">Login success</span>
+                  {% elif et == "login_failed" %}
+                  <span class="badge bg-danger-subtle text-danger">Login failed</span>
+                  {% elif et == "suspicious_activity" %}
+                  <span class="badge bg-warning-subtle text-warning">Suspicious</span>
+                  {% elif et in ["unauthenticated_access", "unauthorized_access"] %}
+                  <span class="badge bg-secondary-subtle text-secondary">Unauthorized</span>
+                  {% else %}
+                  <span class="badge bg-light text-muted border">{{ et }}</span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted">{{ log.details }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <div class="text-center text-muted small py-4">
+          No security events recorded yet.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

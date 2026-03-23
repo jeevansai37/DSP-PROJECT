@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Profile · Secure Healthcare{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+  <div class="page-heading-title">
+    <div class="page-heading-icon">
+      <i class="fa-solid fa-user-injured"></i>
+    </div>
+    <div>
+      <h1>Patient Profile</h1>
+      <div class="text-muted small">
+        Longitudinal medical history and attached documents.
+      </div>
+    </div>
+  </div>
+  <a href="{{ url_for('view_patients') }}" class="btn btn-outline-secondary btn-sm">
+    <i class="fa-solid fa-arrow-left-long me-1"></i> Back to patients
+  </a>
+</div>
+
+<div class="row g-3 g-lg-4">
+  <div class="col-12 col-lg-8">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div class="d-flex align-items-center gap-3">
+            <div
+              class="rounded-circle d-flex align-items-center justify-content-center"
+              style="
+                width: 56px;
+                height: 56px;
+                background: linear-gradient(135deg, #0d6efd1a, #20c9971a);
+                color: #0d6efd;
+              "
+            >
+              <i class="fa-solid fa-user-large"></i>
+            </div>
+            <div>
+              <h2 class="h5 mb-1">{{ patient.name }}</h2>
+              <div class="text-muted small">
+                {{ patient.age }} years &middot; Created by
+                <strong>{{ patient.doctor_username }}</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12 col-md-6">
+            <div class="border rounded-3 p-3 h-100 bg-light">
+              <div class="text-uppercase small text-muted fw-semibold mb-1">
+                Primary diagnosis
+              </div>
+              <div class="fw-semibold">
+                {{ patient.disease }}
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-6">
+            <div class="border rounded-3 p-3 h-100">
+              <div class="text-uppercase small text-muted fw-semibold mb-1">
+                Attending doctor
+              </div>
+              <div class="fw-semibold">
+                {{ patient.doctor_username }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <h3 class="h6 mb-2">Prescription & notes</h3>
+        <div class="border rounded-3 p-3 bg-light-subtle small">
+          <pre class="mb-0" style="white-space: pre-wrap;">{{ patient.prescription }}</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+      <div class="card-body">
+        <h3 class="h6 mb-3">Medical history (demo)</h3>
+        <ul class="list-unstyled small mb-0">
+          <li class="mb-2">
+            <i class="fa-solid fa-circle text-success me-2"></i>
+            Record created in secure registry.
+          </li>
+          <li class="mb-2">
+            <i class="fa-solid fa-circle text-primary me-2"></i>
+            Encrypted attributes decrypted for authorized viewing only.
+          </li>
+          <li>
+            <i class="fa-solid fa-circle text-info me-2"></i>
+            All access events surfaced in Security Logs for audit.
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-4">
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <h3 class="h6 mb-3">Lab reports & prescriptions</h3>
+        <form
+          method="POST"
+          action="{{ url_for('upload_report', patient_id=patient.id) }}"
+          enctype="multipart/form-data"
+          class="small"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="mb-2">
+            <label for="reportFile" class="form-label small text-muted">
+              Upload file
+            </label>
+            <input
+              class="form-control form-control-sm"
+              type="file"
+              id="reportFile"
+              name="report"
+              accept=".pdf,.png,.jpg,.jpeg"
+              required
+            />
+          </div>
+          <div class="mb-2">
+            <label for="reportType" class="form-label small text-muted">
+              Type
+            </label>
+            <select id="reportType" name="type" class="form-select form-select-sm">
+              <option value="Lab report">Lab report</option>
+              <option value="Prescription">Prescription</option>
+              <option value="Imaging">Imaging</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm w-100">
+            <i class="fa-solid fa-cloud-arrow-up me-1"></i>
+            Upload securely
+          </button>
+        </form>
+
+        <hr />
+
+        <h4 class="h6 mb-2">Uploaded files (demo list)</h4>
+        {% if uploaded_reports %}
+        <ul class="list-group list-group-flush small">
+          {% for r in uploaded_reports %}
+          <li
+            class="list-group-item d-flex justify-content-between align-items-center px-0"
+          >
+            <div class="d-flex align-items-center gap-2">
+              <i class="fa-regular fa-file-pdf text-danger"></i>
+              <div>
+                <div class="fw-semibold">{{ r.name }}</div>
+                <div class="text-muted small">{{ r.type }}</div>
+              </div>
+            </div>
+            <span class="badge bg-light text-muted border">
+              {{ r.size }}
+            </span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <div class="text-muted small">
+          No files uploaded yet for this patient.
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
