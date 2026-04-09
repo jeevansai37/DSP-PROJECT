@@ -82,6 +82,14 @@
           <option value="66+">66+</option>
         </select>
       </div>
+      <div class="col-12 col-md-2 align-self-end">
+        <div class="form-check form-switch mb-1">
+          <input class="form-check-input" type="checkbox" id="criticalFilter">
+          <label class="form-check-label small fw-bold text-danger" for="criticalFilter">
+            Critical only
+          </label>
+        </div>
+      </div>
       <div class="col-12 col-md-2 text-md-end">
         <button id="clearFilters" class="btn btn-outline-secondary btn-sm w-100 w-md-auto">
           Clear filters
@@ -99,6 +107,7 @@
             <th scope="col">Age</th>
             <th scope="col">Disease</th>
             <th scope="col">Doctor</th>
+            <th scope="col">Registered</th>
             <th scope="col" class="text-end">Actions</th>
           </tr>
         </thead>
@@ -110,11 +119,21 @@
             data-age="{{ p.age }}"
             data-disease="{{ p.disease|lower }}"
             data-doctor="{{ p.doctor_username|lower }}"
-            onclick="window.location='{{ url_for('patient_profile', patient_id=p.id) }}'"
+            data-critical="{{ p.is_critical }}"
+            onclick="window.location='{{ url_for('patient_profile', patient_id=p.id) }}'; "
           >
             <td>{{ p.id }}</td>
-            <td>
-              <div class="fw-semibold">{{ p.name }}</div>
+            <td
+              data-bs-toggle="tooltip"
+              data-bs-placement="top"
+              title="Full name is hidden for privacy. Click 'Open' to view profile."
+            >
+              <div class="fw-semibold text-truncate" style="max-width: 150px;">
+                {{ p.name }}
+                {% if p.is_critical %}
+                <i class="fa-solid fa-triangle-exclamation text-danger ms-1" title="Critical Case"></i>
+                {% endif %}
+              </div>
             </td>
             <td>{{ p.age }}</td>
             <td>
@@ -123,14 +142,37 @@
               </span>
             </td>
             <td>{{ p.doctor_username }}</td>
+            <td>
+              <span class="text-muted small">
+                <i class="fa-regular fa-clock me-1"></i>{{ p.created_at or '—' }}
+              </span>
+            </td>
             <td class="text-end">
-              <a
-                href="{{ url_for('patient_profile', patient_id=p.id) }}"
-                class="btn btn-outline-secondary btn-sm"
-                onclick="event.stopPropagation();"
-              >
-                <i class="fa-regular fa-folder-open me-1"></i>Open
-              </a>
+              <div class="d-flex justify-content-end gap-2">
+                <a
+                  href="{{ url_for('edit_patient', patient_id=p.id) }}"
+                  class="btn btn-outline-primary btn-sm"
+                  onclick="event.stopPropagation();"
+                  title="Edit Record"
+                >
+                  <i class="fa-solid fa-user-pen"></i>
+                </a>
+                <a
+                  href="{{ url_for('generate_prescription', patient_id=p.id) }}"
+                  class="btn btn-outline-primary btn-sm"
+                  onclick="event.stopPropagation();"
+                  title="Download Digital Prescription"
+                >
+                  <i class="fa-solid fa-file-pdf"></i>
+                </a>
+                <a
+                  href="{{ url_for('patient_profile', patient_id=p.id) }}"
+                  class="btn btn-outline-secondary btn-sm"
+                  onclick="event.stopPropagation();"
+                >
+                  <i class="fa-regular fa-folder-open me-1"></i>Open
+                </a>
+              </div>
             </td>
           </tr>
           {% endfor %}
@@ -152,6 +194,7 @@
     const searchInput = document.getElementById("patientSearch");
     const doctorFilter = document.getElementById("doctorFilter");
     const ageFilter = document.getElementById("ageFilter");
+    const criticalFilter = document.getElementById("criticalFilter");
     const clearFiltersBtn = document.getElementById("clearFilters");
     const rows = document.querySelectorAll("#patientsTable tbody tr");
 
@@ -168,12 +211,14 @@
       const query = (searchInput.value || "").toLowerCase();
       const selectedDoctor = (doctorFilter.value || "").toLowerCase();
       const selectedAge = ageFilter.value || "";
+      const criticalOnly = criticalFilter ? criticalFilter.checked : false;
 
       rows.forEach((row) => {
         const name = row.dataset.name || "";
         const disease = row.dataset.disease || "";
         const doctor = row.dataset.doctor || "";
         const age = row.dataset.age || "";
+        const isCritical = row.dataset.critical === "1";
 
         const matchesSearch =
           !query ||
@@ -187,15 +232,25 @@
         const matchesAge =
           !selectedAge || getAgeBucket(age) === selectedAge;
 
+        const matchesCritical = !criticalOnly || isCritical;
+
         row.style.display =
-          matchesSearch && matchesDoctor && matchesAge ? "" : "none";
+          matchesSearch && matchesDoctor && matchesAge && matchesCritical ? "" : "none";
       });
     }
 
-    if (searchInput && doctorFilter && ageFilter) {
+    // Check for URL parameters (?filter=critical)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('filter') === 'critical' && criticalFilter) {
+      criticalFilter.checked = true;
+      applyFilters();
+    }
+
+    if (searchInput && doctorFilter && ageFilter && criticalFilter) {
       searchInput.addEventListener("input", applyFilters);
       doctorFilter.addEventListener("change", applyFilters);
       ageFilter.addEventListener("change", applyFilters);
+      criticalFilter.addEventListener("change", applyFilters);
     }
 
     if (clearFiltersBtn) {
@@ -203,6 +258,7 @@
         searchInput.value = "";
         doctorFilter.value = "";
         ageFilter.value = "";
+        if (criticalFilter) criticalFilter.checked = false;
         applyFilters();
       });
     }

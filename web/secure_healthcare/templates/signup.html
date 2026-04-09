@@ -1,0 +1,409 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Sign Up · Secure Healthcare{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* Reuse premium login styles */
+  .login-wrapper {
+    position: relative;
+    overflow: hidden;
+    background: radial-gradient(circle at top right, #eef2f8, #f8faff);
+  }
+
+  .bg-shape {
+    position: absolute;
+    filter: blur(80px);
+    z-index: 0;
+    opacity: 0.6;
+    animation: float 10s ease-in-out infinite alternate;
+  }
+
+  .bg-shape-1 {
+    width: 400px;
+    height: 400px;
+    background: linear-gradient(135deg, rgba(13,110,253,0.3), rgba(32,201,151,0.2));
+    border-radius: 50%;
+    top: -100px;
+    right: -100px;
+  }
+
+  .bg-shape-2 {
+    width: 300px;
+    height: 300px;
+    background: linear-gradient(135deg, rgba(32,201,151,0.2), rgba(13,110,253,0.2));
+    border-radius: 50%;
+    bottom: -50px;
+    left: -50px;
+    animation-delay: -5s;
+  }
+
+  @keyframes float {
+    0%   { transform: translate(0, 0) rotate(0deg) scale(1); }
+    100% { transform: translate(-30px, 30px) rotate(15deg) scale(1.05); }
+  }
+
+  .logo-container {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(145deg, #ffffff, #f0f4f8);
+    color: var(--hospital-primary);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(13,110,253,0.15), inset 0 2px 4px rgba(255,255,255,0.8);
+    position: relative;
+  }
+
+  .logo-container::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(135deg, rgba(13,110,253,0.3), rgba(32,201,151,0.3));
+    z-index: -1;
+    filter: blur(8px);
+  }
+
+  .text-gradient {
+    background: linear-gradient(120deg, #061b3a, #0d6efd);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 25px 50px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8) !important;
+  }
+
+  .form-group-custom {
+    position: relative;
+  }
+
+  .custom-input {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border: 1px solid rgba(200, 210, 224, 0.6) !important;
+    border-radius: 12px !important;
+    padding: 1rem 1.25rem;
+    padding-top: 1.625rem;
+    padding-bottom: 0.625rem;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  .custom-input:focus {
+    background: #ffffff !important;
+    border-color: rgba(13,110,253,0.4) !important;
+    box-shadow: 0 0 0 4px rgba(13,110,253,0.1), inset 0 2px 4px rgba(0,0,0,0.02) !important;
+    transform: translateY(-1px);
+  }
+
+  .input-glow {
+    position: absolute;
+    bottom: -1px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--hospital-primary), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 2px;
+  }
+
+  .custom-input:focus ~ .input-glow {
+    opacity: 1;
+  }
+
+  .form-floating > label {
+    padding-left: 1.25rem;
+    color: #6c757d;
+  }
+
+  .form-floating > .custom-input:focus ~ label,
+  .form-floating > .custom-input:not(:placeholder-shown) ~ label {
+    transform: scale(0.85) translateY(-0.75rem) translateX(0.15rem);
+    color: var(--hospital-primary);
+  }
+
+  .form-floating > .custom-input:focus ~ label i {
+    color: var(--hospital-primary) !important;
+  }
+
+  .btn-premium {
+    background: linear-gradient(135deg, #0d6efd, #1b62ff);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    overflow: hidden;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 8px 16px rgba(13,110,253,0.25);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+
+  .btn-premium::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #1b62ff, #0a58ca);
+    z-index: -1;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+
+  .btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(13,110,253,0.35);
+    color: white;
+  }
+
+  .btn-premium:hover::before { opacity: 1; }
+
+  .btn-premium:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 8px rgba(13,110,253,0.2);
+  }
+
+  /* Admin key field accent */
+  .admin-key-wrapper .custom-input {
+    border-color: rgba(255,193,7,0.4) !important;
+    background: rgba(255,253,245,0.95) !important;
+  }
+
+  .admin-key-wrapper .custom-input:focus {
+    border-color: rgba(255,193,7,0.7) !important;
+    box-shadow: 0 0 0 4px rgba(255,193,7,0.12), inset 0 2px 4px rgba(0,0,0,0.02) !important;
+  }
+
+  .admin-key-wrapper .input-glow {
+    background: linear-gradient(90deg, transparent, #ffc107, transparent);
+  }
+
+  .divider-text {
+    display: flex;
+    align-items: center;
+    color: #adb5bd;
+    font-size: 0.78rem;
+    margin: 0.25rem 0 1rem;
+  }
+
+  .divider-text::before, .divider-text::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(200,210,224,0.6);
+  }
+
+  .divider-text::before { margin-right: 0.75rem; }
+  .divider-text::after  { margin-left: 0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center min-vh-100 login-wrapper">
+
+  <!-- Decorative Background Elements -->
+  <div class="bg-shape bg-shape-1"></div>
+  <div class="bg-shape bg-shape-2"></div>
+
+  <div class="col-12 col-md-8 col-lg-6 col-xl-4 position-relative z-1 py-5" style="max-width: 460px;">
+
+    <!-- Header -->
+    <div class="text-center mb-4">
+      <div class="logo-container mx-auto mb-3">
+        <i class="fa-solid fa-user-shield fs-3"></i>
+      </div>
+      <h1 class="h3 fw-bold mb-1 text-gradient">Admin Registration</h1>
+      <p class="text-secondary small mb-0">
+        Create a new administrator account
+      </p>
+    </div>
+
+    <!-- Card -->
+    <div class="card glass-card border-0 shadow-lg mb-4">
+      <div class="card-body p-4 p-sm-5">
+
+        <form method="POST" action="{{ url_for('signup') }}" novalidate id="signupForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+          <!-- Full Name -->
+          <div class="form-floating mb-3 form-group-custom">
+            <input
+              type="text"
+              class="form-control custom-input"
+              id="full_name"
+              name="full_name"
+              placeholder="Full Name"
+              value="{{ form_data.get('full_name', '') }}"
+              required
+              autocomplete="name"
+            />
+            <label for="full_name"><i class="fa-regular fa-id-card me-2 text-muted"></i>Full Name</label>
+            <div class="input-glow"></div>
+          </div>
+
+          <!-- Hospital Name -->
+          <div class="form-floating mb-3 form-group-custom">
+            <input
+              type="text"
+              class="form-control custom-input"
+              id="hospital_name"
+              name="hospital_name"
+              placeholder="Hospital Name"
+              value="{{ form_data.get('hospital_name', '') }}"
+              required
+              autocomplete="organization"
+            />
+            <label for="hospital_name"><i class="fa-solid fa-hospital me-2 text-muted"></i>Hospital Name</label>
+            <div class="input-glow"></div>
+          </div>
+
+          <!-- Username -->
+          <div class="form-floating mb-3 form-group-custom">
+            <input
+              type="text"
+              class="form-control custom-input"
+              id="username"
+              name="username"
+              placeholder="Username"
+              value="{{ form_data.get('username', '') }}"
+              required
+              autocomplete="username"
+            />
+            <label for="username"><i class="fa-regular fa-user me-2 text-muted"></i>Username</label>
+            <div class="input-glow"></div>
+          </div>
+
+          <!-- Email (Google Email) -->
+          <div class="form-floating mb-3 form-group-custom">
+            <input
+              type="email"
+              class="form-control custom-input"
+              id="email"
+              name="email"
+              placeholder="Google Email (@gmail.com)"
+              value="{{ form_data.get('email', '') }}"
+              required
+              pattern=".*@gmail\.com$"
+              autocomplete="email"
+            />
+            <label for="email"><i class="fa-regular fa-envelope me-2 text-muted"></i>Google Email</label>
+            <div class="input-glow"></div>
+          </div>
+
+          <!-- Password -->
+          <div class="form-floating mb-3 form-group-custom">
+            <input
+              type="password"
+              class="form-control custom-input"
+              id="password"
+              name="password"
+              placeholder="Password"
+              required
+              autocomplete="new-password"
+            />
+            <label for="password"><i class="fa-solid fa-lock me-2 text-muted"></i>Password</label>
+            <div class="input-glow"></div>
+          </div>
+
+          <!-- Password requirements checklist -->
+          <div class="mb-4 px-1">
+            <div class="card bg-light border-0 rounded-3 shadow-none">
+              <div class="card-body p-2 px-3">
+                <p class="mb-1 fw-semibold text-secondary" style="font-size: 0.75rem;">Password must contain:</p>
+                <div class="row g-0">
+                  <div class="col-6">
+                    <ul class="list-unstyled mb-0" style="font-size: 0.72rem;">
+                      <li class="d-flex align-items-center gap-2 text-success mb-1">
+                        <i class="fa-solid fa-check-circle"></i> 8+ characters
+                      </li>
+                      <li class="d-flex align-items-center gap-2 text-success">
+                        <i class="fa-solid fa-check-circle"></i> Uppercase
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-6">
+                    <ul class="list-unstyled mb-0" style="font-size: 0.72rem;">
+                      <li class="d-flex align-items-center gap-2 text-success mb-1">
+                        <i class="fa-solid fa-check-circle"></i> Number
+                      </li>
+                      <li class="d-flex align-items-center gap-2 text-success">
+                        <i class="fa-solid fa-check-circle"></i> Symbol (@, #, $)
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-floating mb-4 form-group-custom">
+            <input
+              type="password"
+              class="form-control custom-input"
+              id="confirm_password"
+              name="confirm_password"
+              placeholder="Confirm Password"
+              required
+              autocomplete="new-password"
+            />
+            <label for="confirm_password"><i class="fa-solid fa-lock me-2 text-muted"></i>Confirm Password</label>
+            <div class="input-glow"></div>
+          </div>
+
+
+
+          <button type="submit" class="btn btn-premium w-100 py-3 fw-semibold" id="signupBtn">
+            <span>Create Admin Account</span>
+            <i class="fa-solid fa-user-plus ms-2"></i>
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Back to login -->
+    <div class="text-center">
+      <p class="text-secondary small">
+        Already have an account?
+        <a href="{{ url_for('login') }}" class="text-primary fw-semibold text-decoration-none">
+          Sign In <i class="fa-solid fa-arrow-right ms-1"></i>
+        </a>
+      </p>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Client-side: warn if passwords don't match before submitting
+  document.getElementById('signupForm').addEventListener('submit', function(e) {
+    const pw  = document.getElementById('password').value;
+    const cpw = document.getElementById('confirm_password').value;
+    if (pw && cpw && pw !== cpw) {
+      e.preventDefault();
+      const btn = document.getElementById('signupBtn');
+      btn.classList.add('btn-danger');
+      btn.querySelector('span').textContent = 'Passwords do not match!';
+      setTimeout(() => {
+        btn.classList.remove('btn-danger');
+        btn.querySelector('span').textContent = 'Create Admin Account';
+      }, 2500);
+    }
+  });
+</script>
+{% endblock %}

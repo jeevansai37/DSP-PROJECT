@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Database
+web/secure_healthcare/healthcare.db
+*.db
+
+# Security & Secrets
+.secret.key
+web/secure_healthcare/.secret.key
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,243 @@
+/* 
+   SecureCare Premium UI System
+   A design system built for modern healthcare consoles.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary: #0d6efd;
+    --primary-deep: #061b3a;
+    --primary-glow: rgba(13, 110, 253, 0.15);
+    --accent: #20c997;
+    --bg-main: #f8fafc;
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-main);
+}
+
+h1, h2, h3, .sidebar-brand-title {
+    font-family: 'Outfit', sans-serif;
+}
+
+/* Glassmorphism Components */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    border-radius: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+}
+
+/* Sidebar Refinement */
+.sidebar {
+    background: linear-gradient(165deg, #1b62ff 0%, #020b1f 100%) !important;
+    color: white !important;
+}
+
+.sidebar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.7) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin: 4px 12px;
+    border-radius: 12px;
+    font-weight: 500;
+}
+
+.sidebar-nav .nav-link i {
+    width: 24px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.sidebar-nav .nav-link:hover {
+    color: white !important;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav .nav-link.active {
+    color: white !important;
+    background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0.05));
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.sidebar-nav .nav-link.active i {
+    color: white;
+}
+
+.sidebar-brand-title span {
+    color: white;
+}
+
+.sidebar-footer {
+    color: white;
+}
+
+.sidebar-footer .text-white-50 {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Stats Cards */
+.stat-card {
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-glow);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    z-index: 1;
+}
+
+/* AI Insights Component */
+.ai-insights-card {
+    background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+    border-left: 4px solid var(--primary);
+    position: relative;
+}
+
+.ai-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: var(--primary);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px var(--primary-glow);
+}
+
+.typing-animation::after {
+    content: '|';
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Buttons & Interactive Elements */
+.btn-premium {
+    background: linear-gradient(135deg, var(--primary), #0052cc);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 0.6rem 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 14px 0 rgba(13, 110, 253, 0.39);
+    transition: all 0.2s ease;
+}
+
+.btn-premium:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(13, 110, 253, 0.5);
+    color: white;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Voice-to-Note Dictation */
+.voice-btn {
+    border-radius: 50% !important;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    border: 1px solid rgba(13, 110, 253, 0.2);
+    background: white;
+    color: var(--primary);
+}
+
+.voice-btn:hover {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.voice-btn.recording {
+    background: #ef4444;
+    color: white;
+    border-color: #ef4444;
+    animation: voice-pulse 1.5s infinite;
+}
+
+@keyframes voice-pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.voice-status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+.voice-status.listening {
+    color: #ef4444;
+}

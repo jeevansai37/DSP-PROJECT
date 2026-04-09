@@ -75,6 +75,9 @@
                 name="new_password"
                 required
               />
+              <div class="form-text mt-1" style="font-size: 0.7rem;">
+                Must have 8+ chars, uppercase, number, and special character.
+              </div>
             </div>
             <div class="mb-2">
               <label class="form-label" for="confirm_password">Confirm New Password</label>
@@ -100,18 +103,7 @@
       <div class="card-body">
         <h2 class="h6 mb-3">Session security</h2>
         <form class="small">
-          <div class="form-check form-switch mb-2">
-            <input
-              class="form-check-input"
-              type="checkbox"
-              id="twoFactor"
-              checked
-              disabled
-            />
-            <label class="form-check-label" for="twoFactor">
-              Enforce strong authentication (demo)
-            </label>
-          </div>
+
           <div class="form-check form-switch mb-2">
             <input
               class="form-check-input"

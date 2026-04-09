@@ -1,7 +1,8 @@
 import os
 from cryptography.fernet import Fernet
 
-KEY_FILE = ".secret.key"
+KEY_DIR = os.path.dirname(os.path.abspath(__file__))
+KEY_FILE = os.path.join(KEY_DIR, ".secret.key")
 
 
 def generate_key():

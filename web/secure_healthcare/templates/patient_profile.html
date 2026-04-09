@@ -15,14 +15,40 @@
       </div>
     </div>
   </div>
-  <a href="{{ url_for('view_patients') }}" class="btn btn-outline-secondary btn-sm">
-    <i class="fa-solid fa-arrow-left-long me-1"></i> Back to patients
-  </a>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('edit_patient', patient_id=patient.id) }}" class="btn btn-outline-primary btn-sm">
+      <i class="fa-solid fa-user-pen me-2"></i>Edit Record
+    </a>
+    <a href="{{ url_for('generate_prescription', patient_id=patient.id) }}" class="btn btn-premium btn-sm">
+      <i class="fa-solid fa-file-pdf me-2"></i>Download Prescription
+    </a>
+    <a href="{{ url_for('view_patients') }}" class="btn btn-outline-secondary btn-sm">
+      <i class="fa-solid fa-arrow-left-long me-1"></i> Back
+    </a>
+  </div>
 </div>
 
 <div class="row g-3 g-lg-4">
   <div class="col-12 col-lg-8">
-    <div class="card border-0 shadow-sm mb-3">
+    <div class="glass-card mb-4" id="aiInsightsCard" style="display: none;">
+      <div class="card-body ai-insights-card rounded-4">
+        <span class="ai-badge">AI Insight</span>
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="fa-solid fa-sparkles text-primary"></i>
+          <h3 class="h6 mb-0">Clinical Summary</h3>
+        </div>
+        <div id="aiSummaryContent" class="text-secondary small typing-animation">
+          Processing patient history...
+        </div>
+      </div>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3 rounded-4 overflow-hidden">
+      {% if patient.is_critical %}
+      <div class="bg-danger text-white px-3 py-1 small fw-bold text-center">
+        <i class="fa-solid fa-triangle-exclamation me-2"></i>CRITICAL CASE - DOCTOR ATTENTION REQUIRED
+      </div>
+      {% endif %}
       <div class="card-body">
         <div class="d-flex align-items-start justify-content-between mb-3">
           <div class="d-flex align-items-center gap-3">
@@ -41,10 +67,18 @@
               <h2 class="h5 mb-1">{{ patient.name }}</h2>
               <div class="text-muted small">
                 {{ patient.age }} years &middot; Created by
-                <strong>{{ patient.doctor_username }}</strong>
+                <span class="badge bg-primary-subtle text-primary fw-normal">Dr. {{ patient.doctor_username }}</span>
+                {% if patient.created_at %}
+                &middot; <i class="fa-regular fa-clock me-1"></i>{{ patient.created_at }}
+                {% endif %}
               </div>
             </div>
           </div>
+          {% if session.get('user_role') == 'doctor' %}
+          <button id="btnSummarize" class="btn btn-sm btn-outline-primary border-dashed">
+            <i class="fa-solid fa-wand-magic-sparkles me-1"></i>AI Summarize
+          </button>
+          {% endif %}
         </div>
 
         <div class="row g-3 mb-3">
@@ -140,34 +174,94 @@
 
         <hr />
 
-        <h4 class="h6 mb-2">Uploaded files (demo list)</h4>
+        <h4 class="h6 mb-2">Authenticated Uploaded Documents</h4>
         {% if uploaded_reports %}
-        <ul class="list-group list-group-flush small">
+        <ul class="list-group list-group-flush small border rounded-3">
           {% for r in uploaded_reports %}
-          <li
-            class="list-group-item d-flex justify-content-between align-items-center px-0"
-          >
-            <div class="d-flex align-items-center gap-2">
-              <i class="fa-regular fa-file-pdf text-danger"></i>
-              <div>
-                <div class="fw-semibold">{{ r.name }}</div>
-                <div class="text-muted small">{{ r.type }}</div>
+          <li class="list-group-item d-flex justify-content-between align-items-center bg-white py-3">
+            <div class="d-flex align-items-center gap-3">
+              <div class="flex-shrink-0">
+                  {% if r.filename.endswith('.pdf') %}
+                  <i class="fa-solid fa-file-pdf fs-4 text-danger"></i>
+                  {% elif r.filename.endswith('.png') or r.filename.endswith('.jpg') or r.filename.endswith('.jpeg') %}
+                  <i class="fa-solid fa-file-image fs-4 text-success"></i>
+                  {% else %}
+                  <i class="fa-solid fa-file-medical fs-4 text-primary"></i>
+                  {% endif %}
+              </div>
+              <div class="min-width-0">
+                <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">{{ r.filename }}</div>
+                <div class="text-muted" style="font-size: 0.7rem;">
+                    <i class="fa-regular fa-calendar-check me-1"></i>{{ r.created_at }}
+                </div>
               </div>
             </div>
-            <span class="badge bg-light text-muted border">
-              {{ r.size }}
-            </span>
+            <a href="#" class="btn btn-sm btn-light border small py-1 px-2 disabled" title="Downloading is restricted via vault only. (Demo)">
+                <i class="fa-solid fa-download me-1"></i> Vault
+            </a>
           </li>
           {% endfor %}
         </ul>
         {% else %}
-        <div class="text-muted small">
-          No files uploaded yet for this patient.
+        <div class="alert alert-light border small text-muted py-3 px-3 mb-0">
+            <i class="fa-solid fa-folder-open me-2"></i> No documents have been attached to this record yet.
         </div>
         {% endif %}
       </div>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const btnSummarize = document.getElementById("btnSummarize");
+    const aiInsightsCard = document.getElementById("aiInsightsCard");
+    const aiSummaryContent = document.getElementById("aiSummaryContent");
+
+    if (btnSummarize) {
+      btnSummarize.addEventListener("click", async function () {
+        // Toggle UI
+        aiInsightsCard.style.display = "block";
+        aiSummaryContent.textContent = "Connecting to medical AI engine...";
+        aiSummaryContent.classList.add("typing-animation");
+        btnSummarize.disabled = true;
+        btnSummarize.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+        try {
+          const response = await fetch("{{ url_for('summarize_patient', patient_id=patient.id) }}");
+          if (!response.ok) {
+            const errData = await response.json();
+            throw new Error(errData.error || "Summarization failed");
+          }
+          const data = await response.json();
+
+          // Typing effect
+          aiSummaryContent.textContent = "";
+          const text = data.summary;
+          let i = 0;
+          function typeWriter() {
+            if (i < text.length) {
+              aiSummaryContent.textContent += text.charAt(i);
+              i++;
+              setTimeout(typeWriter, 15);
+            } else {
+              aiSummaryContent.classList.remove("typing-animation");
+              btnSummarize.innerHTML = '<i class="fa-solid fa-check me-1"></i>Summarized';
+            }
+          }
+          typeWriter();
+
+        } catch (err) {
+          aiSummaryContent.textContent = "Error: " + err.message;
+          aiSummaryContent.classList.remove("typing-animation");
+          btnSummarize.disabled = false;
+          btnSummarize.innerHTML = '<i class="fa-solid fa-triangle-exclamation me-1"></i>Try Again';
+        }
+      });
+    }
+  });
+</script>
 {% endblock %}
 

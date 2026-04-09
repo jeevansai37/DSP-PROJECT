@@ -52,25 +52,27 @@
     </div>
   </div>
   <div class="col-12 col-md-4">
-    <div class="card border-0 shadow-sm h-100">
-      <div class="card-body d-flex flex-column">
-        <div class="d-flex justify-content-between align-items-start mb-2">
-          <div>
-            <div class="text-uppercase text-muted small fw-semibold mb-1">
-              Critical Cases
+    <a href="{{ url_for('view_patients', filter='critical') }}" class="text-decoration-none h-100">
+      <div class="card border-0 shadow-sm h-100 border-start border-danger border-4">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <div>
+              <div class="text-uppercase text-muted small fw-semibold mb-1">
+                Critical Cases
+              </div>
+              <div class="h3 mb-0 text-danger">{{ stats.critical_cases or 0 }}</div>
             </div>
-            <div class="h3 mb-0">{{ stats.critical_cases or 0 }}</div>
+            <span class="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center"
+              style="width: 40px; height: 40px;">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </span>
           </div>
-          <span class="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center"
-            style="width: 40px; height: 40px;">
-            <i class="fa-solid fa-triangle-exclamation"></i>
-          </span>
+          <p class="text-muted small mb-0">
+            Patients flagged with high‑priority diagnoses for rapid attention.
+          </p>
         </div>
-        <p class="text-muted small mb-0">
-          Patients flagged with high‑priority diagnoses for rapid attention.
-        </p>
       </div>
-    </div>
+    </a>
   </div>
   <div class="col-12 col-md-4">
     <div class="card border-0 shadow-sm h-100">
@@ -126,10 +128,15 @@
               {% for p in recent_patients %}
               <tr>
                 <td>
-                  <div class="fw-semibold">{{ p.name }}</div>
-                  <div class="text-muted small">
-                    {{ p.age }} yrs
-                  </div>
+                <div class="fw-semibold text-truncate" style="max-width: 150px;">
+                {{ p.name }}
+                {% if p.is_critical %}
+                <i class="fa-solid fa-triangle-exclamation text-danger ms-1" title="Critical Case"></i>
+                {% endif %}
+              </div>
+                <div class="text-muted small">
+                  {{ p.age }} yrs
+                </div>
                 </td>
                 <td class="d-none d-md-table-cell">
                   <span class="badge bg-primary-subtle text-primary">
@@ -160,25 +167,67 @@
   </div>
 
   <div class="col-12 col-lg-4">
+    {% if role == 'admin' %}
     <div class="card border-0 shadow-sm mb-3">
       <div class="card-body">
-        <h2 class="h6 mb-3">Security posture</h2>
+        <h2 class="h6 mb-3">Security Overview</h2>
+        
+        <div class="d-flex align-items-center mb-3">
+            <div class="flex-shrink-0">
+                <div class="rounded-circle {% if security_stats.status == 'Secure' %}bg-success{% else %}bg-warning{% endif %} d-flex align-items-center justify-content-center" style="width: 12px; height: 12px;"></div>
+            </div>
+            <div class="ms-2 fw-semibold small">
+                System Status: {{ security_stats.status }}
+            </div>
+            {% if security_stats.status != 'Secure' %}
+            <span class="ms-auto badge bg-warning text-dark small">⚠ Warning</span>
+            {% else %}
+            <span class="ms-auto badge bg-success text-white small">🛡 Protected</span>
+            {% endif %}
+        </div>
+
+        <div class="row g-2 mb-3">
+            <div class="col-6">
+                <div class="p-2 border rounded bg-light text-center">
+                    <div class="small text-muted mb-1">Failed Logins</div>
+                    <div class="h5 mb-0 {% if security_stats.failed_attempts_total > 0 %}text-danger{% endif %}">
+                        {{ security_stats.failed_attempts_total }}
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="p-2 border rounded bg-light text-center">
+                    <div class="small text-muted mb-1">Alerts</div>
+                    <div class="h5 mb-0 {% if security_stats.recent_alerts > 0 %}text-warning{% endif %}">
+                        {{ security_stats.recent_alerts }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="h7 small fw-bold text-uppercase text-muted mb-2">Recent Security Events</h3>
         <ul class="list-unstyled small mb-0">
-          <li class="d-flex align-items-center mb-2">
-            <i class="fa-solid fa-lock text-success me-2"></i>
-            End-to-end encryption for all patient attributes.
+          {% for log in security_stats.recent_logs %}
+          <li class="mb-2 pb-2 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <span class="fw-semibold">{{ log.event_type|replace('_', ' ')|capitalize }}</span>
+                <span class="text-muted" style="font-size: 0.7rem;">{{ log.timestamp.split(' ')[1][:5] if ' ' in log.timestamp else '' }}</span>
+            </div>
+            <div class="text-muted text-truncate" style="font-size: 0.75rem;">{{ log.details }}</div>
           </li>
-          <li class="d-flex align-items-center mb-2">
-            <i class="fa-solid fa-user-shield text-primary me-2"></i>
-            Role-based access control (Doctor / Admin).
-          </li>
-          <li class="d-flex align-items-center">
-            <i class="fa-solid fa-clock text-info me-2"></i>
-            All access events visible in Security Logs.
-          </li>
+          {% else %}
+          <li class="text-muted py-2">No recent security events.</li>
+          {% endfor %}
         </ul>
+        
+        <div class="mt-3">
+            <a href="{{ url_for('security_logs') }}" class="btn btn-sm btn-outline-secondary w-100">
+                View Detailed Logs
+            </a>
+        </div>
       </div>
     </div>
+    {% endif %}
 
     <div class="card border-0 shadow-sm">
       <div class="card-body">
@@ -215,7 +264,9 @@
             </p>
           </div>
         </div>
-        <canvas id="patientsPerDayChart" height="90"></canvas>
+        <div style="height: 250px; position: relative;">
+          <canvas id="patientsPerDayChart"></canvas>
+        </div>
       </div>
     </div>
   </div>
@@ -227,7 +278,9 @@
         <p class="text-muted small mb-0">
           Breakdown of primary conditions across current patients.
         </p>
-        <canvas id="diseaseDistributionChart" height="140"></canvas>
+        <div style="height: 250px; position: relative;">
+          <canvas id="diseaseDistributionChart"></canvas>
+        </div>
       </div>
     </div>
 
@@ -237,7 +290,9 @@
         <p class="text-muted small mb-0">
           Age-band view of active patient records.
         </p>
-        <canvas id="ageGroupsChart" height="120"></canvas>
+        <div style="height: 200px; position: relative;">
+          <canvas id="ageGroupsChart"></canvas>
+        </div>
       </div>
     </div>
   </div>
