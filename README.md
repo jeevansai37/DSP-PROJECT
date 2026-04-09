@@ -19,7 +19,9 @@
 ### 2. Identity & Access Governance (IAM)
 - **Adaptive Hashing**: Passwords are secured using **Bcrypt** with a high cost factor to neutralize brute-force attacks.
 - **Active Threat Defense**: 3-attempt lockouts with 15-minute freezes and real-time IP tracking.
-- **Granular RBAC**: Strict separation between Doctor (Clinical) and Admin (Ops) roles using the "Least Privilege" principle.
+- **Granular RBAC**: 
+    - **Doctor Role**: Full access to clinical management and patient record lifecycle.
+    - **Admin Role**: System-wide oversight (Identity management, Audit logs), but **strictly restricted** from viewing, editing, or uploading patient clinical documents.
 
 ---
 
