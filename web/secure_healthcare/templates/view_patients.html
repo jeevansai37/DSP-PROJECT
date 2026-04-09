@@ -144,7 +144,7 @@
             <td>{{ p.doctor_username }}</td>
             <td>
               <span class="text-muted small">
-                <i class="fa-regular fa-clock me-1"></i>{{ p.created_at or '—' }}
+                <i class="fa-regular fa-clock me-1"></i>{{ p.created_at | datetime_format("%Y-%m-%d %H:%M") if p.created_at else '—' }}
               </span>
             </td>
             <td class="text-end">

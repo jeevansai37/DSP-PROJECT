@@ -111,7 +111,7 @@
             <tbody>
               {% for log in logs %}
               <tr>
-                <td class="small text-muted">{{ log.timestamp }}</td>
+                <td class="small text-muted">{{ log.timestamp | datetime_format }}</td>
                 <td class="small">
                   {{ log.username or "N/A" }}
                   {% if log.role %}

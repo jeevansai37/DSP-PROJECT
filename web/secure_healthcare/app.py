@@ -43,6 +43,26 @@ csrf = CSRFProtect(app)
 
 generate_key()
 
+# ---------------------------------------------------------------------------
+# Template Filters
+# ---------------------------------------------------------------------------
+
+@app.template_filter("datetime_format")
+def datetime_format(value, format="%d %b %Y, %I:%M %p"):
+    if not value:
+        return "-"
+    try:
+        if isinstance(value, str):
+            # Parse ISO-like string from database
+            dt = datetime.fromisoformat(value)
+        elif isinstance(value, datetime):
+            dt = value
+        else:
+            return str(value)
+        return dt.strftime(format)
+    except Exception:
+        return value
+
 
 # ---------------------------------------------------------------------------
 # Helpers

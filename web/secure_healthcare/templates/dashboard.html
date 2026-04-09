@@ -211,7 +211,7 @@
           <li class="mb-2 pb-2 border-bottom border-light">
             <div class="d-flex justify-content-between">
                 <span class="fw-semibold">{{ log.event_type|replace('_', ' ')|capitalize }}</span>
-                <span class="text-muted" style="font-size: 0.7rem;">{{ log.timestamp.split(' ')[1][:5] if ' ' in log.timestamp else '' }}</span>
+                <span class="text-muted" style="font-size: 0.7rem;">{{ log.timestamp | datetime_format("%H:%M") }}</span>
             </div>
             <div class="text-muted text-truncate" style="font-size: 0.75rem;">{{ log.details }}</div>
           </li>

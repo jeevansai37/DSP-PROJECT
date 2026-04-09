@@ -69,7 +69,7 @@
                 {{ patient.age }} years &middot; Created by
                 <span class="badge bg-primary-subtle text-primary fw-normal">Dr. {{ patient.doctor_username }}</span>
                 {% if patient.created_at %}
-                &middot; <i class="fa-regular fa-clock me-1"></i>{{ patient.created_at }}
+                &middot; <i class="fa-regular fa-clock me-1"></i>{{ patient.created_at | datetime_format }}
                 {% endif %}
               </div>
             </div>
@@ -192,7 +192,7 @@
               <div class="min-width-0">
                 <div class="fw-bold text-dark text-truncate" style="max-width: 180px;">{{ r.filename }}</div>
                 <div class="text-muted" style="font-size: 0.7rem;">
-                    <i class="fa-regular fa-calendar-check me-1"></i>{{ r.created_at }}
+                    <i class="fa-regular fa-calendar-check me-1"></i>{{ r.created_at | datetime_format }}
                 </div>
               </div>
             </div>
