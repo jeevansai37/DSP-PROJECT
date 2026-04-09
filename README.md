@@ -5,94 +5,81 @@
 [![Database: SQLite](https://img.shields.io/badge/Database-SQLite-003B57.svg)](https://www.sqlite.org/)
 [![Status: Production-Ready](https://img.shields.io/badge/Status-Production--Ready-green.svg)]()
 
-**MedCrypt** is an advanced, security-hardened healthcare management platform engineered to bridge the critical gap between clinical efficiency and patient data privacy. Built with a **"Zero-Trust Persistence"** philosophy, the system ensures that sensitive medical records remain cryptographically isolated at the application layer, neutralizing the threat of database exfiltration.
+**MedCrypt** is an advanced healthcare management platform engineered to bridge the clinical gap between medical efficiency and patient data privacy. Built with a **"Zero-Trust Persistence"** philosophy, the system ensures that sensitive records remain cryptographically isolated at the application layer.
 
 ---
 
 ## 🔐 Core Security Blueprint
 
 ### 1. Application-Level Encryption (AES-128)
-Unlike traditional systems that rely on perimeter security, MedCrypt implements **Field-Level Encryption** before data touches the persistent storage.
 - **Symmetric Ciphering**: Utilizes the **Fernet (AES-128)** specification in CBC mode.
-- **Integrity Guarantee**: Every encrypted block includes an **HMAC-SHA256 signature**. Tampering with a single bit in the database will cause a decryption failure, ensuring 100% data integrity.
-- **Logic Wall**: Plaintext data is strictly volatile; it exists only in system memory during an authorized session.
+- **Integrity Guarantee**: Every encrypted block includes an **HMAC-SHA256 signature**. Tampering with the database results in an immediate decryption failure.
+- **Logic Wall**: Plaintext data exists only in volatile system memory during an authorized session.
 
 ### 2. Identity & Access Governance (IAM)
-- **Adaptive Hashing**: Passwords are secured using **Bcrypt** with a programmable cost factor, rendering GPU-accelerated brute-force attacks computationally unfeasible.
-- **Active Threat Defense**: 
-    - **3-Attempt Lockout**: Accounts are automatically frozen for 15 minutes after 3 failed login attempts.
-    - **Session Hardening**: Cookies are flagged as `HttpOnly` and `SameSite=Lax` to mitigate XSS and Session Hijacking.
-- **Granular RBAC**: 
-    - **Doctors**: Restricted to patient cohorts they registered. No access to system-wide security logs.
-    - **Admins**: Full oversight of system health, security auditing, and hospital-level analytics, but **mathematically isolated** from clinical medical notes.
-
-### 3. Institutional Data Isolation
-MedCrypt employs a "Multi-Tenant" logic where hospital domains act as a hard boundary. Administrators and Doctors are logically bound to their specific institution, preventing cross-hospital data leakage even in a shared database environment.
+- **Adaptive Hashing**: Passwords are secured using **Bcrypt** with a high cost factor to neutralize brute-force attacks.
+- **Active Threat Defense**: 3-attempt lockouts with 15-minute freezes and real-time IP tracking.
+- **Granular RBAC**: Strict separation between Doctor (Clinical) and Admin (Ops) roles using the "Least Privilege" principle.
 
 ---
 
-## 📊 Feature Deep-Dive
+## 📁 Project Structure
 
-### 👨‍⚕️ Clinical Workflow (Doctor)
-- **Voice-to-Note Dictation**: Integrated **Web Speech API** for hands-free clinical transcription, reducing administrative burnout.
-- **Prescription Engine**: Dynamic **PDF generation (ReportLab)** for professional, signed prescriptions.
-- **Patient Profile**: A 360-degree view of medical history, including secure file uploads for lab reports.
-
-### 🛡️ Security & Ops (Admin)
-- **Live Security Ticker**: Real-time audit trail recording every high-stakes event (Logins, Unauthorized views, etc.).
-- **Clinical Analytics**: Aggregated disease and demographic trends visualized through **Chart.js** without exposing PII.
-- **User Management**: Direct control over staff registration and emergency account lockouts.
+```text
+DSP PROJECT/
+├── web/
+│   └── secure_healthcare/
+│       ├── app.py              # The "Brain": Handles routing & RBAC logic.
+│       ├── encryption.py       # The "Shield": AES-128 encryption engine.
+│       ├── db.py               # Database connection & row factory.
+│       ├── healthcare.db       # The "Vault": Encrypted SQLite storage.
+│       ├── init_db.py          # The "Architect": Builds tables & staff accounts.
+│       ├── static/             # Assets & CSS.
+│       └── templates/          # Jinja2 HTML templates.
+└── README.md                   # Project Documentation.
+```
 
 ---
 
-## 🛠️ Technical Ecosystem
+## 🚀 Getting Started
 
-| Component | Technology | Role |
-| :--- | :--- | :--- |
-| **Backend** | Python 3.10 / Flask | Business logic & Routing |
-| **Cryptography** | Fernet (AES) / Bcrypt | Secrecy & Identity Storage |
-| **Data Layer** | SQLite3 | Relational Binary Storage |
-| **Frontend** | HTML5 / CSS3 / Jinja2 | Glassmorphic Design System |
-| **Analytics** | Chart.js | Visualization |
-| **Reports** | ReportLab | PDF Generation |
+1. **Terminal Navigation**:
+   ```powershell
+   cd web/secure_healthcare
+   ```
 
----
+2. **Environment Configuration**:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-## 🚀 Deployment & Setup Guide
+3. **Initialize the Vault**:
+   ```bash
+   python init_db.py
+   ```
+   > [!CAUTION]
+   > This generates a `.secret.key`. Loss of this key will result in permanent loss of all encrypted records.
 
-### 1. Environment Configuration
-Clone the repository and install the required dependencies:
-```bash
-pip install -r requirements.txt
-```
+4. **Launch the Platform**:
+   ```bash
+   python app.py
+   ```
 
-### 2. Physical Vault Initialization
-Run the architect script to generate your master encryption key and database schema:
-```bash
-python init_db.py
-```
-> [!CAUTION]
-> This will generate a `.secret.key` file. Loss of this key will result in permanent loss of all clinical data.
-
-### 3. System Execution
-Launch the Flask WSGI server:
-```bash
-python app.py
-```
-Access the platform at `http://127.0.0.1:5000`.
+5. **Login Credentials**:
+   - URL: `http://127.0.0.1:5000`
+   - **Admin**: `admin` / `password123`
+   - **Doctor**: `jeevan123` / `Admin@123`
 
 ---
 
 ## 📈 Experimental Performance Analysis
-
-We have achieved high-security compliance without sacrificing clinical speed:
-- **Encryption Overhead**: Avg **+26ms** per record.
-- **Retrieval Overhead**: Avg **+24ms** per record.
-- **Attack Resilience**: **100% mitigation** of SQLi and Brute Force simulations during stress testing.
+- **Encryption Overhead**: Avg +26ms per record.
+- **Retrieval Overhead**: Avg +24ms per record.
+- **Attack Resilience**: 100% mitigation of SQLi and Brute Force simulations.
 
 ---
 
 ## 📜 Compliance Notice
-MedCrypt is built to satisfy **HIPAA Technical Safeguards** (£164.312) including Access Control, Audit Controls, and Integrity checks.
+MedCrypt satisfies **HIPAA Technical Safeguards** (£164.312) including Access Control, Audit Controls, and Integrity checks.
 
-> **Final Thought**: In an era of rising cyber-threats, privacy is not a preference—it is a requirement. MedCrypt ensuring that what happens in the clinic, stays in the clinic.
+> **Final Thought**: In an era of rising cyber-threats, privacy is not a preference—it is a requirement. MedCrypt ensures that what happens in the clinic, stays in the clinic.
