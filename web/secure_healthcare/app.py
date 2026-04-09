@@ -92,9 +92,12 @@ def _build_patient_filter(user_role, user_id, hospital_name):
         return "WHERE created_by = ?", (user_id,)
     
     if user_role == "admin":
-        # Security Policy: Admins are strictly forbidden from viewing clinical records. 
-        # They manage system users and infrastructure only.
-        return "WHERE 1=0", ()
+        if hospital_name and str(hospital_name).strip():
+            # Admins see all patients created by doctors in their hospital
+            return "WHERE created_by IN (SELECT id FROM users WHERE hospital_name = ?)", (hospital_name,)
+        else:
+            # Security: If an admin has no hospital name, they see NOTHING.
+            return "WHERE 1=0", ()
             
     return "WHERE 1=0", ()
 
@@ -691,7 +694,7 @@ def edit_patient(patient_id):
 
 @app.route("/patients")
 @login_required
-@role_required("doctor")
+@role_required("doctor", "admin")
 def view_patients():
     user_id       = session.get("user_id")
     user_role     = session.get("user_role")
@@ -732,7 +735,7 @@ def view_patients():
 
 @app.route("/patients/<string:patient_id>")
 @login_required
-@role_required("doctor")
+@role_required("doctor", "admin")
 def patient_profile(patient_id):
     user_id       = session.get("user_id")
     user_role     = session.get("user_role")
@@ -880,7 +883,7 @@ def upload_report(patient_id):
 
 @app.route("/patients/<string:patient_id>/prescription")
 @login_required
-@role_required("doctor")
+@role_required("doctor", "admin")
 def generate_prescription(patient_id):
     user_id       = session.get("user_id")
     user_role     = session.get("user_role")
@@ -1011,7 +1014,7 @@ def generate_prescription(patient_id):
 
 @app.route("/medical-records")
 @login_required
-@role_required("doctor")
+@role_required("doctor", "admin")
 def medical_records():
     user_id       = session.get("user_id")
     user_role     = session.get("user_role")

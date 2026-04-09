@@ -20,8 +20,8 @@
 - **Adaptive Hashing**: Passwords are secured using **Bcrypt** with a high cost factor to neutralize brute-force attacks.
 - **Active Threat Defense**: 3-attempt lockouts with 15-minute freezes and real-time IP tracking.
 - **Granular RBAC**: 
-    - **Doctor Role**: Full access to clinical management and patient record lifecycle.
-    - **Admin Role**: System-wide oversight (Identity management, Audit logs), but **strictly restricted** from viewing, editing, or uploading patient clinical documents.
+    - **Doctor Role**: Full access to clinical management and patient record lifecycle (Add, Edit, Upload).
+    - **Admin Role**: View-Only oversight of clinical records for their hospital. Strictly restricted from editing, adding, or uploading patient data.
 
 ---
 
